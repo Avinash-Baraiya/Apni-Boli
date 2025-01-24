@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
 import { connectDB } from './database/connection.js';
 import { errorMiddleware } from './middlewares/error.js';
+import userRouter from './routes/userRoute.js';
 
 const app = express();
 
@@ -12,11 +13,9 @@ dotenv.config({
     path: "./config/config.env",
 });
 
-app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST", "PUT", "DELETE"],// default is GET, POST, PUT, DELETE
-    credentials: true, // enable set cookie
-}));
+// const cors = require('cors');
+app.use(cors());
+
 
 app.use(cookieParser()); // to access the cookies 
 app.use(express.json()); // to parse json data
@@ -28,9 +27,9 @@ app.use(fileUpload(
     }
 ));
 
+app.use("/api/v1/user",userRouter)
+
 connectDB();
-
-
 app.use(errorMiddleware);
 
 
