@@ -1,8 +1,10 @@
+import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../middlewares/error.js";
 import { User } from "../models/userSchema.js";
 import {v2 as cloudinary} from "cloudinary";
+import { generateToken } from "../utils/jsonToken.js";
 
-export const registerUser = async (req, res, next) => {
+export const registerUser = catchAsyncError (async (req, res, next) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     return next(new ErrorHandler("Profile Image Required", 400));
   }
@@ -97,16 +99,7 @@ export const registerUser = async (req, res, next) => {
             },
         },
     });
-
-    // ...existing code...
-res.status(201).json({
-    success: true,
-    message: "User registered successfully",
-    user,
-  });
-  // ...existing code...
-
-
-
-
-};  
+    
+    // yaha hum token generate kar rahe hain
+    generateToken(user, "User registered successfully", 201, res);
+});  

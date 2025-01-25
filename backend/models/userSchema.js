@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   address: String,
   phone: {
     type: String,
-    minLength: [11, "Phone Number must have exact 11 digits."],
+    minLength: [10, "Phone Number must have exact 11 digits."],
     maxLength: [11, "Phone Number must have exact 11 digits."],
   },
   profileImage: {
@@ -36,7 +36,8 @@ const userSchema = new mongoose.Schema({
       bankAccountName: String,
       bankName: String,
     },
-    easypaisa: { // changes here may be required
+    easypaisa: {
+      // changes here may be required
       easypaisaAccountNumber: Number,
     },
     paypal: {
@@ -67,6 +68,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
+    // agar password change nahi hua toh next() call karo
     return next();
   }
   this.password = await bcrypt.hash(this.password, 10);
@@ -78,8 +80,11 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
 };
 
 userSchema.methods.generateJsonWebToken = function () {
+  const expiresIn = process.env.JWT_EXPIRE;
+
+  // Check if the expiresIn is a number or a string (like '7d')
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRE,
+    expiresIn: expiresIn, // This can be a number or a string like '7d'
   });
 };
 
